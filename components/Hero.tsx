@@ -1,4 +1,7 @@
 'use client';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 import React, { useState } from 'react';
 import {
@@ -27,13 +30,25 @@ const Hero = () => {
     setInput(event.target.value);
   };
 
-  const handleSearch = () => {
-    if (input) {
-      searchByPostcode(input);
-    } else {
-      console.error('Input is empty');
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is not defined in the environment variables');
+   // process.exit(1);
+  }
+
+const handleSearch = async () => {
+  if (input) {
+    try {
+      const query = 'SELECT * FROM your_table_name WHERE postcode = ?'; // Replace 'your_table_name' with your actual table name
+      const [rows] = await connection.execute(query, [input]);
+      console.log('Search results:', rows);
+    } catch (error) {
+      console.error('An error occurred while executing the query:', error);
     }
-  };
+  } else {
+    console.error('Input is empty');
+  }
+};
 
   const handleLocationSearch = () => {
     if (navigator.geolocation) {
